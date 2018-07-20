@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Data Visualization Final Project</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/beige.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					<textarea data-template>
+						## Slide 1 title
+
+						Sample **paragraph**.
+					</textarea>
+				</section>
+				<section>
+					<section>
+							<h3>See if this works...chart below</h3>
+							<div class="fig-container" data-file="scatterplot.html"></div>
+					</section>
+					<section>
+						<h3>Slide 2aaaa</h3>
+						<svg id="viz" width="720" height="405"></svg>
+					</section>
+					<section>Slide 2b</section>
+					<section>Slide 2c</section>
+				</section>
+				<section>
+					<section>Slide 3a</section>
+					<section>Slide 3b</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/reveald3.js' }
+				]
+			});
+		</script>
+		<!-- d3 v4 imports -->
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+		<script type="text/javascript">
+			var cwidth = 720;
+			var cheight = 405;
+			var data = [ 10, 5, 5, 8, 9, 3, 2 ];
+			var chart = d3.select("#viz").selectAll("circle").data(data);
+			chart.enter()
+			.append("rect")
+			.merge(chart)
+			.attr("width", 15)
+			.attr("height", function(d) { return 10*d; })
+			.attr("x", function(d,i) { return 300+i*20;})
+			.attr("y", function (d) { return (405 / 2.0) - (5.0 * d); })
+			.attr("tokenid", function(d, i) { return d*i*64;})
+			.attr("fill", "steelblue ");
+		</script>
+
+	</body>
+</html>
