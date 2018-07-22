@@ -1,91 +1,96 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
 <style>
 
-.bar {
-  fill: steelblue;
-}
-
-.bar:hover {
-  fill: brown;
-}
-
-.axis--x path {
+.axis .domain {
   display: none;
 }
 
 </style>
-<body>
-  <div>
-    <svg id="viz" width="960" height="500"></svg>
-  </div>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
 
-  <!-- d3 v4 imports -->
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-  <script type="text/javascript">
-    // var cwidth = 720;
-    // var cheight = 405;
-    // var dataStore = [ 10, 5, 5, 8, 9, 3, 2 ];
-    // get the data
-    var svg = d3.select("svg"),
-        margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-        y = d3.scaleLinear().rangeRound([height, 0]);
+var x = d3.scaleBand()
+    .rangeRound([0, width])
+    .paddingInner(0.05)
+    .align(0.1);
 
-    var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    //d3.csv("./data.csv", function(error, data) {
-    d3.text("data.csv", function(text) {
-      var data = d3.csvParseRows(text).map(function(row) {
-        return row.map(function(value) {
-          return +value;
-        });
-      });
-      parsedData = data[0];
-      //console.log(data);
-      //parsedData = data.columns;
-      //if (error) throw error;
-      //var chart = d3.select("#viz").selectAll("rect").data(parsedData);
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
 
-      x.domain(parsedData.map(function(d) { return d; }));
-      y.domain([0, d3.max(parsedData, function(d) { return d; })]);
+var z = d3.scaleOrdinal().range([d3.rgb(0,152,0),  d3.rgb(0,182,200), d3.rgb(255,96,0), d3.rgb(225,0,20), d3.rgb(137,72,181)]);
 
-      g.append("g")
-          .attr("class", "axis axis--x")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
+d3.csv("binned_sales.csv", function(d, i, columns) {
+  for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
+  d.total = t;
+  console.log(d.total);
+  return d;
+  }, function(error, data) {
+  if (error) throw error;
 
-      g.append("g")
-          .attr("class", "axis axis--y")
-          .call(d3.axisLeft(y).ticks(10))
-        .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", "0.71em")
-          .attr("text-anchor", "end")
-          .text("Frequency");
+  var keys = data.columns.slice(1);
 
-      g.selectAll(".bar")
-        .data(parsedData)
-        .enter().append("rect")
-          .attr("class", "bar")
-          .attr("x", function(d) { return x(d); })
-          .attr("y", function(d) { return y(d); })
-          .attr("width", x.bandwidth())
-          .attr("height", function(d) { return height - y(d); });
-      // chart.enter()
-      // .append("rect")
-      // .merge(chart)
-      // .attr("width", 15)
-      // .attr("height", function(d) { console.log(d); return 10*d; })
-      // .attr("x", function(d,i) { return 400+i*20;})
-      // .attr("y", function (d) { return (405 / 2.0) - (5.0 * d); })
-      // .attr("tokenid", function(d, i) { return d*i*64;})
-      // .attr("fill", "steelblue ");
-    })
-  </script>
-</body>
+  data.sort(function(a, b) { return d3.ascending(a['Metacritic Score [binned]'], b['Metacritic Score [binned]']); });
+  x.domain(data.map(function(d) { return d['Metacritic Score [binned]']; }));
+  y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+  z.domain(keys);
+
+  g.append("g")
+    .selectAll("g")
+    .data(d3.stack().keys(keys)(data))
+    .enter().append("g")
+      .attr("fill", function(d) { return z(d.key); })
+    .selectAll("rect")
+    .data(function(d) { return d; })
+    .enter().append("rect")
+      .attr("x", function(d) { return x(d.data['Metacritic Score [binned]']); })
+      .attr("y", function(d) { return y(d[1]); })
+      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+      .attr("width", x.bandwidth());
+
+  g.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  g.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y).ticks(null, ".4"))
+    .append("text")
+      .attr("x", 2)
+      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("dy", "0.32em")
+      .attr("fill", "#000")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "start")
+      .text("Global Sales (millions of units)");
+
+  var legend = g.append("g")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .attr("text-anchor", "end")
+    .selectAll("g")
+    .data(keys.slice().reverse())
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 19)
+      .attr("width", 19)
+      .attr("height", 19)
+      .attr("fill", z);
+
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9.5)
+      .attr("dy", "0.32em")
+      .text(function(d) { return d; });
+});
+
+</script>
