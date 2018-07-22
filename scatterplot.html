@@ -16,21 +16,32 @@
     <script>
 
         // Create data
-        function randomData(samples) {
-            var data = [],
-                random = d3.randomNormal();
+        // function randomData(samples) {
+        //     var data = [],
+        //         random = d3.randomNormal();
                 
-            for (i = 0; i < samples; i++) {
-                data.push({
-                    x: random(),
-                    y: random()
-                });
-            }
-            return data;
-        }
+        //     for (i = 0; i < samples; i++) {
+        //         data.push({
+        //             x: random(),
+        //             y: random()
+        //         });
+        //     }
+        //     return data;
+        // }
 
-        var data = randomData(300);
-
+        //var data = randomData(300);
+        d3.tsv("./VG_sales_2016.csv") 
+        .row(function(d) {
+          return {
+            metacritic_score: +d['Metacritic Score'],
+            global_sales: +d['Global Sales']
+          };
+        })
+        .get(function(data) {
+          //for (var i = 0; i < 1; i++) {
+          //console.log(JSON.stringify(data[i]));
+          //console.log(typeof data[i].global_sales);
+          //}
         var margin = { top: 20, right: 20, bottom: 30, left: 30 };
         width = 900 - margin.left - margin.right,
         height = 480 - margin.top - margin.bottom;
@@ -67,10 +78,11 @@
             .attr("x", 0) 
             .attr("y", 0); 
 
-        var xExtent = d3.extent(data, function (d) { return d.x; });
-        var yExtent = d3.extent(data, function (d) { return d.y; });
-        x.domain(d3.extent(data, function (d) { return d.x; })).nice();
-        y.domain(d3.extent(data, function (d) { return d.y; })).nice();
+        var xExtent = d3.extent(data, function (d) { return d.metacritic_score; });
+        var yExtent = d3.extent(data, function (d) { return d.global_sales; });
+
+        x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
+        y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
 
         var scatter = svg.append("g")
              .attr("id", "scatterplot")
@@ -81,8 +93,8 @@
           .enter().append("circle")
             .attr("class", "dot")
             .attr("r", 4)
-            .attr("cx", function (d) { return x(d.x); })
-            .attr("cy", function (d) { return y(d.y); })
+            .attr("cx", function (d) { return x(d.metacritic_score); })
+            .attr("cy", function (d) { return y(d.global_sales); })
             .attr("opacity", 0.5)
             .style("fill", "#4292c6");
 
@@ -121,8 +133,8 @@
             var s = d3.event.selection;
             if (!s) {
                 if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-                x.domain(d3.extent(data, function (d) { return d.x; })).nice();
-                y.domain(d3.extent(data, function (d) { return d.y; })).nice();
+                x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
+                y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
             } else {
                 
                 x.domain([s[0][0], s[1][0]].map(x.invert, x));
@@ -142,9 +154,9 @@
             svg.select("#axis--x").transition(t).call(xAxis);
             svg.select("#axis--y").transition(t).call(yAxis);
             scatter.selectAll("circle").transition(t)
-            .attr("cx", function (d) { return x(d.x); })
-            .attr("cy", function (d) { return y(d.y); });
+            .attr("cx", function (d) { return x(d.metacritic_score); })
+            .attr("cy", function (d) { return y(d.global_sales); });
         }
-
+      });
     </script>
 </body>
