@@ -7,34 +7,45 @@
             font-family: "Helvetica Neue", Helvetica, sans-serif;
             font-size: 14px;
         }
-             
+        .y line {
+            stroke: lightgrey;
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+        div.tooltip {
+            position: absolute;
+            display:inline-block;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: white;
+            border: 1px solid;
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 5px 5px 3px black;
+        }
+        .table-key {
+            color: grey;
+            font-weight:400;
+        }
+        .table-value {
+            font-weight:600;
+        }
     </style>
 </head>
 <body>
 
     <script src="//d3js.org/d3.v4.min.js"></script>
     <script>
-
-        // Create data
-        // function randomData(samples) {
-        //     var data = [],
-        //         random = d3.randomNormal();
-                
-        //     for (i = 0; i < samples; i++) {
-        //         data.push({
-        //             x: random(),
-        //             y: random()
-        //         });
-        //     }
-        //     return data;
-        // }
-
-        //var data = randomData(300);
         d3.tsv("./VG_sales_2016.csv") 
         .row(function(d) {
           return {
+            name: d['Name'],
             metacritic_score: +d['Metacritic Score'],
-            global_sales: +d['Global Sales']
+            global_sales: +d['Global Sales'],
+            age_rating: d['Age Rating'],
+            genre: d['Genre'],
+            platform: d['Platform'],
+            year: d['Year of Release']
           };
         })
         .get(function(data) {
@@ -42,9 +53,9 @@
           //console.log(JSON.stringify(data[i]));
           //console.log(typeof data[i].global_sales);
           //}
-        var margin = { top: 20, right: 20, bottom: 30, left: 30 };
-        width = 900 - margin.left - margin.right,
-        height = 480 - margin.top - margin.bottom;
+        var margin = { top: 30, right: 20, bottom: 50, left: 50 };
+        width = 1200 - margin.left - margin.right,
+        height = 700 - margin.top - margin.bottom;
 
         var tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -54,11 +65,13 @@
               .range([0, width])
               .nice();
 
-        var y = d3.scaleLinear()
+        //var y = d3.scaleLinear()
+        var y = d3.scaleLog()
             .range([height, 0]);
 
-        var xAxis = d3.axisBottom(x).ticks(12),
-            yAxis = d3.axisLeft(y).ticks(12 * height / width);
+        var xAxis = d3.axisBottom(x).ticks(21),
+            //yAxis = d3.axisLeft(y).ticks(12 * height / width);
+            yAxis = d3.axisLeft(y).ticks(30, ",.3").tickSize(-width);
 
         var brush = d3.brush().extent([[0, 0], [width, height]]).on("end", brushended),
             idleTimeout,
@@ -82,21 +95,66 @@
         var yExtent = d3.extent(data, function (d) { return d.global_sales; });
 
         x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
-        y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
-
+        //y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
+        y.domain([0.007, 100]);
+        
         var scatter = svg.append("g")
              .attr("id", "scatterplot")
              .attr("clip-path", "url(#clip)");
+
+        scatter.append("g")
+             .attr("class", "brush")
+             .call(brush);
             
         scatter.selectAll(".dot")
             .data(data)
           .enter().append("circle")
             .attr("class", "dot")
-            .attr("r", 4)
+            .attr("r", 2.5)
             .attr("cx", function (d) { return x(d.metacritic_score); })
             .attr("cy", function (d) { return y(d.global_sales); })
             .attr("opacity", 0.5)
-            .style("fill", "#4292c6");
+            .style("fill", "#4292c6")
+            .on("mouseover", function(d) {
+                tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+                const tooltipString = "<div><div style='text-align: center;'><b>" + d.name + "</b></div>"
+                                    + "<table>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Metacritic Score:</td>"
+                                    + "<td class='table-value'>" + d.metacritic_score + "</td>"
+                                    + "</tr>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Sales:</td>"
+                                    + "<td class='table-value'>" + d.global_sales + "M (units)</td>"
+                                    + "</tr>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Platform:</td>"
+                                    + "<td class='table-value'>" + d.platform + "</td>"
+                                    + "</tr>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Age Rating:</td>"
+                                    + "<td class='table-value'>" + d.age_rating + "</td>"
+                                    + "</tr>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Genre:</td>"
+                                    + "<td class='table-value'>" + d.genre + "</td>"
+                                    + "</tr>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Year:</td>"
+                                    + "<td class='table-value'>" + d.year + "</td>"
+                                    + "</tr>"
+                                    + "</table>"
+                tooltip.html(tooltipString)
+                .style("left", (d3.event.pageX + 12) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })					
+          .on("mouseout", function(d) {
+              tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
         // x axis
         svg.append("g")
@@ -106,10 +164,16 @@
            .call(xAxis);
 
         svg.append("text")
-         .style("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height - 8)
-         .text("X Label");
+           .style("text-anchor", "begin")
+           .attr("x", width/2 - 50)
+           .attr("y", height + 50)
+           .text("Metacritic Score");
+
+        svg.append("text")
+           .style("text-anchor", "begin")
+           .attr("x", width/2 - 200)
+           .attr("y", -10)
+           .text("Video Game Sales vs. Metacritic Scores (8,050 Games From 1980-2016)");
 
         // y axis
         svg.append("g")
@@ -120,13 +184,10 @@
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
-            .attr("dy", "1em")
+            .attr("dy", "-3em")
+            .attr("dx", "-14em")
             .style("text-anchor", "end")
-            .text("Y Label");
-
-        scatter.append("g")
-            .attr("class", "brush")
-            .call(brush);
+            .text("Global Sales [millions of units (log scale)]");
 
         function brushended() {
 
