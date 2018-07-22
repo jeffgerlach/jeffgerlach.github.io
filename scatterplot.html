@@ -84,14 +84,6 @@
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var clip = svg.append("defs").append("svg:clipPath")
-            .attr("id", "clip")
-            .append("svg:rect")
-            .attr("width", width )
-            .attr("height", height )
-            .attr("x", 0) 
-            .attr("y", 0); 
-
         var xExtent = d3.extent(data, function (d) { return d.metacritic_score; });
         var yExtent = d3.extent(data, function (d) { return d.global_sales; });
 
@@ -99,6 +91,20 @@
         //y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
         y.domain([0.007, 100]);
         
+        // y axis
+        svg.append("g")
+          .attr("class", "y axis")
+          .attr('id', "axis--y")
+          .call(yAxis);
+
+        var clip = svg.append("defs").append("svg:clipPath")
+            .attr("id", "clip")
+            .append("svg:rect")
+            .attr("width", width )
+            .attr("height", height )
+            .attr("x", 0) 
+            .attr("y", 0);       
+
         var scatter = svg.append("g")
              .attr("id", "scatterplot")
              .attr("clip-path", "url(#clip)");
@@ -110,7 +116,6 @@
         //var color = d3.scaleOrdinal(d3.schemeCategory20);
         var color = d3.scaleOrdinal([d3.rgb(0,152,0), d3.rgb(225,0,20), d3.rgb(255,96,0), d3.rgb(0,182,200), d3.rgb(137,72,181)]);
 
-                    
         scatter.selectAll(".dot")
             .data(data)
             .enter().append("circle")
@@ -182,11 +187,6 @@
            .style("font-size", 24)
            .text("Video Game Sales vs. Metacritic Scores (8,050 Games From 1980-2016)");
 
-        // y axis
-        svg.append("g")
-            .attr("class", "y axis")
-            .attr('id', "axis--y")
-            .call(yAxis);
 
         svg.append("text")
             .attr("transform", "rotate(-90)")
