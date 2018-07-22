@@ -58,9 +58,9 @@
           //}
         var border=1;
         var bordercolor='black';
-        var margin = { top: 30, right: 150, bottom: 50, left: 50 };
-        width = 1200 - margin.left - margin.right,
-        height = 700 - margin.top - margin.bottom;
+        var margin = { top: 50, right: 150, bottom: 50, left: 50 };
+        width = 1000 - margin.left - margin.right,
+        height = 800 - margin.top - margin.bottom;
 
         var tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -174,15 +174,16 @@
            .call(xAxis);
 
         svg.append("text")
-           .style("text-anchor", "begin")
-           .attr("x", width/2 - 50)
+           .style("text-anchor", "middle")
+           .attr("x", width/2)
            .attr("y", height + 50)
            .text("Metacritic Score");
 
         svg.append("text")
-           .style("text-anchor", "begin")
-           .attr("x", width/2 - 200)
-           .attr("y", -10)
+           .style("text-anchor", "middle")
+           .attr("x", width/2)
+           .attr("y", -20)
+           .style("font-size", 24)
            .text("Video Game Sales vs. Metacritic Scores (8,050 Games From 1980-2016)");
 
         // y axis
