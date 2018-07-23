@@ -55,20 +55,21 @@ var x = d3.scaleBand()
 var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-var z = d3.scaleOrdinal().range([d3.rgb(0,152,0),  d3.rgb(0,182,200), d3.rgb(255,96,0), d3.rgb(225,0,20), d3.rgb(137,72,181)]);
+var z = d3.scaleOrdinal(d3.schemeCategory20);
 
-d3.csv("binned_sales.csv", function(d, i, columns) {
+d3.csv("regional_sales_final.csv", function(d, i, columns) {
   for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
   d.total = t;
   return d;
   }, function(error, data) {
   if (error) throw error;
 
-  var keys = data.columns.slice(1);
-
+  //var keys = data.columns.slice(1);
+  var keys = ["NA Sales", "EU Sales", "Other Sales", "JP Sales"]
+  
   data.sort(function(a, b) { return d3.ascending(a['Metacritic Score [binned]'], b['Metacritic Score [binned]']); });
   x.domain(data.map(function(d) { return d['Metacritic Score [binned]']; }));
-  y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+  y.domain([0, d3.max(data, function(d) { return d.total; }) + 100]).nice();
   z.domain(keys);
 
   g.append("g")
@@ -110,7 +111,7 @@ d3.csv("binned_sales.csv", function(d, i, columns) {
                 const tooltipString = "<div><div style='text-align: center; color:" + z(d[2]) + "'>" + d[2] + "</div>"
                                     + "<table>"
                                     + "<tr>"
-                                    + "<td class='table-key'>Global Sales:</td>"
+                                    + "<td class='table-key'>Regional Sales:</td>"
                                     + "<td class='table-value'>" + d3.format(".5")(d[1]-d[0]) + " million units</td>"
                                     + "</tr><tr>"
                                     + "<td class='table-key'>%Total:</td>"
@@ -168,6 +169,15 @@ d3.csv("binned_sales.csv", function(d, i, columns) {
       .attr("y", 9.5)
       .attr("dy", "0.32em")
       .text(function(d) { return d; });
+
+  var legendTitle = g.append("text")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 12)
+      .attr("font-weight", 800)
+      .attr("x", width+20)
+      .attr("y", -10)
+      .text("Region");
+
 });
 
 </script>
