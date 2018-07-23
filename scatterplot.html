@@ -29,6 +29,7 @@
         .table-key {
             color: grey;
             font-weight:400;
+            text-align: right;
         }
         .table-value {
             font-weight:600;
@@ -90,7 +91,7 @@
         x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
         //y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
         y.domain([0.007, 100]);
-        
+
         // y axis
         svg.append("g")
           .attr("class", "y axis")
@@ -112,8 +113,7 @@
         scatter.append("g")
              .attr("class", "brush")
              .call(brush);
-            
-        //var color = d3.scaleOrdinal(d3.schemeCategory20);
+
         var color = d3.scaleOrdinal([d3.rgb(0,152,0), d3.rgb(225,0,20), d3.rgb(255,96,0), d3.rgb(0,182,200), d3.rgb(137,72,181)]);
 
         scatter.selectAll(".dot")
@@ -124,7 +124,6 @@
             .attr("cx", function (d) { return x(d.metacritic_score); })
             .attr("cy", function (d) { return y(d.global_sales); })
             .attr("opacity", 1.0)
-            //.style("fill", "#4292c6")
             .style("fill", function(d) { return color(d.age_rating); })
             .on("mouseover", function(d) {
                 tooltip.transition()
@@ -160,7 +159,7 @@
                 tooltip.html(tooltipString)
                 .style("left", (d3.event.pageX + 12) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
-            })					
+            })	
           .on("mouseout", function(d) {
               tooltip.transition()
                 .duration(500)
@@ -262,26 +261,14 @@
           }
         });
 
-        // svg.append("rect")
-        //    .attr("x", width+10)
-        //    .attr("y", 0)
-        //    .attr("width", 130)
-        //    .attr("height", 150)
-        //    .style("stroke", "black")
-        //    .style("fill", "none");
-
-        //    svg.append("text")
-        //    .attr("x", width+50)
-        //    .attr("y", 0)
-        //    .text("test");
-
         function brushended() {
 
             var s = d3.event.selection;
             if (!s) {
                 if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
                 x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
-                y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
+                //y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
+                y.domain([0.007, 100]);
             } else {
                 
                 x.domain([s[0][0], s[1][0]].map(x.invert, x));
