@@ -78,8 +78,8 @@
 				<section>
 					<section data-markdown>
 						<textarea data-template>
-							### CS498 Data Visualization Final Project
-
+							### Do Metacritic Ratings Impact Game Sales?
+							##### CS498 Data Visualization Final Project
 
 							Jeff Gerlach
 							<button class="myButton" onclick="Reveal.down()" style="margin-top: 150px">About This Visualization</button>
@@ -203,9 +203,9 @@ inform the user how to activate the triggers.
 							
 							
 							<p style="font-size: 18px; font-weight: 600; margin-bottom: 0px">Tools:</p>
-							<a href="https://d3js.org" style="font-size: 16px; margin-top: 0px">https://d3js.org/</a>
+							<a href="https://d3js.org" target="_blank" style="font-size: 16px; margin-top: 0px">https://d3js.org/</a>
 							<br />
-							<a href="https://revealjs.com/" style="font-size: 16px; margin-top: 0px">https://revealjs.com/</a>
+							<a href="https://revealjs.com/" target="_blank" style="font-size: 16px; margin-top: 0px">https://revealjs.com/</a>
 							
 							
 							<p style="font-size: 18px; font-weight: 600">Notice:</p>
@@ -217,7 +217,7 @@ inform the user how to activate the triggers.
 				</section>
 				<section>
 					<div class="essay-row">
-						<div style="width: 20%; float: left;">
+						<div style="width: 20%; float: left; text-align: left">
 							<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
 								<u>Overview</u>
 							</p>
@@ -228,7 +228,7 @@ inform the user how to activate the triggers.
 								to progress, left arrow (or key) to backtrack. 
 							</p>
 							<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
-								Metacritic scores are retrieved from a website (www.metacritic.com) that aggregates multiple games
+								Metacritic scores are retrieved from a website (<a href="http://www.metacritic.com" target="_blank" style="font-size: 11px; margin-top: 0px">metacritic.com</a>) that aggregates multiple games
 								journalists' review scores for a game and normalizes them on a scale from 1 to 100. This data is
 								grouped by age rating, which is assigned using the ESRB rating system in use in the USA.
 							</p>
@@ -246,7 +246,7 @@ inform the user how to activate the triggers.
 				<section>
 					<section>
 							<div class="essay-row">
-									<div style="width: 20%; float: left;">
+									<div style="width: 20%; float: left; text-align: left">
 										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
 											<u>Age Rating</u>
 										</p>
@@ -258,7 +258,8 @@ inform the user how to activate the triggers.
 										</p>
 										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
 											This data is grouped by age rating, which is assigned using the ESRB rating system in use in 
-											the USA. A tailed normal distribution in sales data when plotted against Metacritic score
+											the USA (<a href="http://www.esrb.org/ratings/" target="_blank" style="font-size: 11px; margin-top: 0px">www.esrb.org/ratings/</a>)
+											. A tailed normal distribution in sales data when plotted against Metacritic score
 											is an interesting takeaway. Another is the high level of Mature rated games with higher scores.
 										</p>
 										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
@@ -275,7 +276,7 @@ inform the user how to activate the triggers.
 					</section>
 					<section>
 							<div class="essay-row">
-									<div style="width: 20%; float: left;">
+									<div style="width: 20%; float: left; text-align: left">
 										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
 											<u>Regional Sales</u>
 										</p>
@@ -287,7 +288,7 @@ inform the user how to activate the triggers.
 											</p>
 											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
 												This data is grouped by regional sales, which in this data set was split into North America,
-												European Union, Japan and Other. The tailed normal distribution in sales data when plotted against 
+												European Union, Japan and Other sales. The tailed normal distribution in sales data when plotted against 
 												Metacritic score is obviously still present. We can see that North America accounts for nearly half 
 												of all game sales, and that each of the divisions follow the same normal distribution.
 											</p>
@@ -304,7 +305,7 @@ inform the user how to activate the triggers.
 					</section>
 					<section>
 							<div class="essay-row">
-									<div style="width: 20%; float: left;">
+									<div style="width: 20%; float: left; text-align: left">
 										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
 											<u>Platform</u>
 										</p>
@@ -337,7 +338,7 @@ inform the user how to activate the triggers.
 					</section>
 					<section>
 							<div class="essay-row">
-									<div style="width: 20%; float: left;">
+									<div style="width: 20%; float: left; text-align: left">
 										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
 											<u>Genre</u>
 										</p>
@@ -369,9 +370,25 @@ inform the user how to activate the triggers.
 					</section>
 				</section>
 				<section>
-					<section>
-						Conclusion
-					</section>
+						<p style="font-size: 18px; font-weight: 600">Data Source:</p>
+						<p style="font-size: 14px">
+							<a href="https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings">
+								https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings
+						</a>
+						</p>
+						
+						
+						<p style="font-size: 18px; font-weight: 600; margin-bottom: 0px">Tools:</p>
+						<a href="https://d3js.org" target="_blank" style="font-size: 16px; margin-top: 0px">https://d3js.org/</a>
+						<br />
+						<a href="https://revealjs.com/" target="_blank" style="font-size: 16px; margin-top: 0px">https://revealjs.com/</a>
+						
+						
+						<p style="font-size: 18px; font-weight: 600">Notice:</p>
+						<p style="font-size: 14px">
+						This visualization is intended to be viewed on Chrome (recommended), Firefox, or Safari with a minimum resolution of 1000 x 600 pixels - a smaller viewport could cause display issues (if you do resize your window, try refreshing the page to re-render with the new size) .
+						</p>
+						<button class="myButton" onclick="Reveal.slide(0,1,1);" style="margin-top: 50px">About This Visualization</button>
 				</section>
 			</div>
 		</div>
