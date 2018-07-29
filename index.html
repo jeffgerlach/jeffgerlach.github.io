@@ -104,7 +104,7 @@ v4 (and no external libraries) are used to provide visual consistency between sc
 arrows on the keyboard or click the left/right/down/up arrows on the bottom right of each slide to transition 
 through the trigger points on each scene. The second scene allows the user to click/press the down arrow to 
 drill further down into different groupings of the sales data for further exploration. The arrow buttons in the 
-lower right will blink and move to inform the user that they can be used for navigation.
+lower right will blink and move to inform the user that they can be used for navigation (type '?' on keyboard for help).
 </p>
 
 <p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Scenes:</p>
@@ -150,9 +150,9 @@ triggers follow from the second scene.
 
 <p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Annotations:</p>
 <p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
-The annotations use combinations of SVG rectangles, circles, ellipses, lines, and arrows drawn using d3 with the 
-similar styling and text size to provide visual consistency in each scene and highlight trends in the data. The 
-annotations in each scene change based on the triggers of transitioning using the arrow keys/clicks, which will 
+The annotations use combinations of SVG rectangles, circles, ellipses, lines, and arrows drawn using d3 with 
+similar styling and text size to provide visual consistency in each scene and highlight key points. The 
+annotations in each scene change based on the triggers of transitioning using the arrow keys, which will 
 clear old annotations and add new ones based on the current view of the data in place (all of the annotations are 
 independent of one another and are controlled by changing opacity on each of the slide transitions). The final 
 annotation of each scene/chart informs the user that they are open to explore the data using the corresponding 
@@ -163,19 +163,19 @@ with more data.
 <div class="essay-column" style="text-align: left">
 <p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Parameters:</p>
 <p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
-The driving parameter in each of the scenes and charts is the groupings of the data in question. In the scatter 
+The driving parameter in each of the scenes and charts is the groupings of the sales data in question. In the scatter 
 plot (first scene) and first stacked bar chart (second scene) the parameter is Age Rating using the US’s ESRB rating 
 system (Everyone 6+ years old, Everyone 10+ years old, Teen (13+ years old), Mature (17+ years old), and Adults 
-Only (18+ years old). Using the left/right arrow keys in each chart will auto filter the data and provide annotations 
-to highlight interesting observations before being cleared on the final transition in each chart to allow the reader 
-to manually filter based on the parameter. In the following scenes (reached by pressing/clicking down on the 2nd 
-scene), the parameters are: Sales Region (North America, EU, Japan, and Other), Console Platform (Xbox, Playstation, 
-etc), and Game Genre (Action, Sports, Shooter, etc). 
+Only (18+ years old)). Using the arrow keys in each chart will auto filter the data based on the category in question and 
+provide annotations to highlight interesting observations before being cleared on the final transition in each chart to 
+allow the reader to manually filter based on the parameter. In the following scenes (reached by pressing/clicking down on 
+the 2nd scene), the parameters are: Sales Region (North America, EU, Japan, and Other), Console Platform (Xbox, Playstation, 
+etc), and Game Genre (Action, Sports, Shooter, etc) in relation to total sales numbers by Metacritic score. 
 </p>
 
 <p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Triggers:</p>
 <p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
-Triggers are implemented in this visualization mainly through the use of the arrow keys/arrow buttons (provided by 
+Triggers are implemented in this visualization mainly through the use of the arrow buttons (provided by 
 reveal.js in the lower right of each slide) along with the ability to click on the legends of each chart on the final 
 transition of each scene to filter the data by grouping, which allows for further exploration of the data. The scatter 
 plot triggers filter the sales data by age rating and display annotations on the plot to highlight interesting data. 
@@ -183,14 +183,13 @@ The final transition of the scatterplot in the first scene allows the reader to 
 trigger a zoom in addition to filtering the data through the legend.
 </p>
 <p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
-The transitions on the bar chart scenes also 
-filter the sales data by the grouping detailed on the chart (switching from a stacked bar chart to a regular bar 
-chart) allowing for observations of trends without obfuscation from the stacking on the chart. The bar chart 
-triggers also present different annotations to highlight observations in the data to the reader. The reveal.js 
-arrows will blink and move to alert the user they are available, and various text annotations in the slide also 
-inform the user how to activate the triggers.
+The transitions on the bar chart scenes also filter the sales data by the categories detailed on the chart 
+(switching from a stacked bar chart to a regular bar chart on filter) allowing for observations of trends without 
+obfuscation from the stacking on the chart. The bar chart triggers also present different annotations to 
+highlight observations in the data to the reader. The reveal.js arrows will blink and move to alert the 
+user they are available, and various text annotations in the slide also inform the user how to activate 
+the triggers.
 </p>
-
 </div>
 					</section>
 					<section>
