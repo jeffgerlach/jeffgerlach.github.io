@@ -325,7 +325,7 @@ d3.csv("binned_sales.csv", function(error, data) {
 
   
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", width + 15)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color)
@@ -372,14 +372,6 @@ d3.csv("binned_sales.csv", function(error, data) {
             }
 
             
-            //disable sort checkbox
-            d3.select("label")
-              .style("color", "#D8D8D8")
-              .select("input")
-              .property("disabled", true)
-              .property("checked", false);   
-
-
             //sort bars back to original positions if necessary
             //change();            
 
@@ -394,10 +386,11 @@ d3.csv("binned_sales.csv", function(error, data) {
       });
 
 legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", width + 37)
       .attr("y", 9)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
+      .style("font-size", 12)
+      .style("text-anchor", "begin")
       .text(function(d) { return d; });
 
   // restore graph after a single selection

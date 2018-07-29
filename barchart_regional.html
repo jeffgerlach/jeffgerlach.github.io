@@ -306,7 +306,7 @@ d3.csv("regional_sales_final.csv", function(error, data) {
 
   
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", width + 10)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color)
@@ -352,15 +352,7 @@ d3.csv("regional_sales_final.csv", function(error, data) {
                   .style("opacity", 1);
             }
 
-            
-            //disable sort checkbox
-            d3.select("label")
-              .style("color", "#D8D8D8")
-              .select("input")
-              .property("disabled", true)
-              .property("checked", false);   
-
-
+ 
             //sort bars back to original positions if necessary
             //change();            
 
@@ -375,10 +367,11 @@ d3.csv("regional_sales_final.csv", function(error, data) {
       });
 
 legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", width + 34)
       .attr("y", 9)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
+      .style("font-size", 12)
+      .style("text-anchor", "begin")
       .text(function(d) { return d; });
 
   // restore graph after a single selection
@@ -560,28 +553,7 @@ var _transitions = [
             enableFilter = false;
         },
         index: 1
-      },
-      // {
-      //   transitionForward: () => {
-      //     d3.selectAll('.annotation2')
-      //       .style('opacity', 0)
-      //     d3.selectAll('.annotationArrow')
-      //       .style('opacity', 0)
-      //     d3.selectAll('.annotation3')
-      //       .style('opacity', 1)
-      //       enableFilter = true;
-      //   },
-      //   transitionBackward: () => {
-      //     d3.selectAll('.annotation2')
-      //       .style('opacity', 1)
-      //     d3.selectAll('.annotationArrow')
-      //       .style('opacity', 1)
-      //     d3.selectAll('.annotation3')
-      //       .style('opacity', 0)
-      //       enableFilter = false;
-      //   },
-      //   index: 2
-      // }
+      }
     ]
 
 </script>
