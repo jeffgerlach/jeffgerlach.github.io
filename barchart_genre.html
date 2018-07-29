@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<head>
 <style>
 
 .axis .domain {
@@ -23,25 +24,82 @@ div.tooltip {
     box-shadow: 5px 5px 3px black;
 }
 .table-key {
-            color: grey;
-            font-weight:400;
-            text-align: right;
+    color: grey;
+    font-weight:400;
+    text-align: right;
 }
 .table-value {
-            font-weight:600;
+    font-weight:600;
 }
+.bars:hover {
+  fill: purple !important;
+}
+.annotation1 {
+    opacity: 0.0;
+}
+.annotation2 {
+    opacity: 0.0;
+}
+.annotation3 {
+    opacity: 0.0;
+}
+.annotationArrow {
+    opacity: 0.0;
+}
+svg {
+    width: 100%;
+    align-content: center;
+  }
 </style>
+</head>
 
-<svg width="1100" height="600"></svg>
+<body>
+    <!-- <button id="button1">Next</button> -->
+    <svg></svg>
+</body>
+
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
+    // var myButton = document.getElementById('button1');
+    // myButton.addEventListener('click', function(event) {
+    //     //setOpacity('annotation2', 0);
+    //     var annotationsClass = document.getElementsByClassName('annotation1');
+    //     console.log(annotationsClass);
+    //     for (const ele of annotationsClass) {
+    //         ele.style.opacity = 0
+    //     }
+    // });
+//var svg = d3.select("svg"),
+    //margin = {top: 40, right: 125, bottom: 40, left: 40},
+    //width = +svg.attr("width") - margin.left - margin.right,
+    //height = +svg.attr("height") - margin.top - margin.bottom,
+    //g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var margin = {top: 40, right: 20, bottom: 40, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-var svg = d3.select("svg"),
-    margin = {top: 40, right: 125, bottom: 40, left: 40},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //annotations
+const annotation1 = {
+        annotationNumber: 1,
+        rectX: (width/4),
+        rectY: 70,
+        rectWidth: 310,
+        rectHeight: 30,
+        textFontSize: 14,
+        lineEndX: 725,
+        lineEndY: 375,
+        textValue: "North American sales make up around 50% of sales"
+    };
+    const annotation2 = { ...annotation1, annotationNumber: 2, textValue: "The bulk of sales occur with a score of 80-89"};
+    const annotation3 = { ...annotation1, annotationNumber: 3, textValue: "Click the legend to filter sales regions"};
+    const annotation4 = { ...annotation1, annotationNumber: 3, textValue: "Hover over the bars for more info"};
+
+    const annotations = [
+        annotation1,
+        annotation2,
+        annotation3
+    ];
 
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
@@ -55,79 +113,56 @@ var x = d3.scaleBand()
 var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-var z = d3.scaleOrdinal(d3.schemeCategory20);
+var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-d3.csv("genre_sales.csv", function(d, i, columns) {
-  for (i = 1, t = 0; i < columns.length; ++i) t += d[columns[i]] = +d[columns[i]];
-  d.total = t;
-  return d;
-  }, function(error, data) {
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+var active_link = "0"; //to control legend selections and hover
+var legendClicked; //to control legend selections
+var legendClassArray = []; //store legend classes to select bars in plotSingle()
+var legendClassArray_orig = []; //orig (with spaces)
+//var sortDescending; //if true, bars are sorted by height in descending order
+
+var enableFilter = true;
+
+d3.csv("genre_sales.csv", function(error, data) {
   if (error) throw error;
 
   var keys = data.columns.slice(1);
+  //var keys = ["Everyone6","Everyone10","Teen","Mature","Adults Only"];
+  //color.domain(keys);
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Metacritic Score [binned]"; }));
+  data.forEach(function(d) {
+    var currentScore = d['Metacritic Score [binned]']; //add to stock code
+    var y0 = 0;
+    //d.ages = color.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
+    d.regions = color.domain().map(function(name) {
+      //return { mystate:mystate, name: name, y0: y0, y1: y0 += +d[name]}; });
+      return { 
+        currentScore: currentScore, 
+        name: name, 
+        y0: y0, 
+        y1: y0 += +d[name], 
+        value: d[name],
+        y_corrected: 0
+      }; 
+      });
+    d.total = d.regions[d.regions.length - 1].y1;    
 
+  });
+
+  
   data.sort(function(a, b) { return d3.ascending(a['Metacritic Score [binned]'], b['Metacritic Score [binned]']); });
   x.domain(data.map(function(d) { return d['Metacritic Score [binned]']; }));
-  y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
-  z.domain(keys);
+  y.domain([0, d3.max(data, function(d) { return d.total; }) + 100]).nice();
+  //z.domain(keys);
 
-  g.append("g")
-      .attr("class", "axis")
-      .attr("class", "grid")
-      .call(d3.axisLeft(y).ticks(null, ".4").tickSize(-width))
-    .append("text")
-      .attr("x", 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "-0.5em")
-      .attr("fill", "#000")
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "start")
-      .text("Global Sales (millions of units)");
-      
-  g.append("g")
-    .selectAll("g")
-    .data(d3.stack().keys(keys)(data))
-    .enter().append("g")
-      .attr("fill", function(d) { return z(d.key); })
-    .selectAll("rect")
-    .data(function(d) {
-      d.forEach(element => {
-        element.push(d.key)
-      })
-      return d; 
-    })
-    .enter().append("rect")
-      .attr("x", function(d) { return x(d.data['Metacritic Score [binned]']); })
-      .attr("y", function(d) { return y(d[1]); })
-      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-      .attr("width", x.bandwidth())
-      .on("mouseover", function(d) {
-                tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-            })
-       .on("mousemove", function(d) {
-                const tooltipString = "<div><div style='text-align: center; color:" + z(d[2]) + "'>" + d[2] + "</div>"
-                                    + "<table>"
-                                    + "<tr>"
-                                    + "<td class='table-key'>Global Sales:</td>"
-                                    + "<td class='table-value'>" + d3.format(".5")(d[1]-d[0]) + " million units</td>"
-                                    + "</tr><tr>"
-                                    + "<td class='table-key'>%Total:</td>"
-                                    + "<td class='table-value'>" + d3.format(".3")(((d[1]-d[0])/d.data.total*100)) + "%</td>"
-                                    + "</tr></table></div>"
-                //console.log(z(d[2]));
-                tooltip.html(tooltipString)
-                .style("left", (d3.event.pageX + 12) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-          })					
-      .on("mouseout", function(d) {
-          tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-    });
-
-  g.append("g")
+  svg.append("g")
       .attr("class", "axis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
@@ -139,44 +174,395 @@ d3.csv("genre_sales.csv", function(d, i, columns) {
       .attr("font-weight", "bold")
       .attr("text-anchor", "middle")
       .text("Metacritic Score [binned]");
-      
-  g.append("text")
+
+  svg.append("g")
+      .attr("class", "axis")
+      .attr("class", "grid")
+      .call(d3.axisLeft(y).ticks(null, ".4").tickSize(-width))
+      .append("text")
+      .attr("x", 2)
+      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("dy", "-0.5em")
+      .attr("fill", "#000")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "start")
+      .text("Global Sales (millions of units)");
+
+    svg.append("text")
       .style("text-anchor", "middle")
       .attr("x", width/2)
       .attr("y", -20)
       .style("font-size", 18)
-      .text("Total Video Game Sales vs. Binned Metacritic Scores (8,050 Games From 1980-2016)");
+      .text("Total Video Game Sales By Genre vs. Binned Metacritic Scores (8,050 Games From 1980-2016)");
 
-  var legend = g.append("g")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10)
-      .attr("text-anchor", "end")
-    .selectAll("g")
-    .data(keys.slice().reverse())
+    var score = svg.selectAll(".score")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
+
+   height_diff = 0;  //height discrepancy when calculating h based on data vs y(d.y0) - y(d.y1)
+   score.selectAll("rect")
+      .data(function(d) {
+        d.regions.map(region => region.total=d.total);
+        return d.regions; 
+      })
+    .enter().append("rect")
+      .attr("width", x.bandwidth())
+      .attr("y", function(d) {
+        height_diff = height_diff + y(d.y0) - y(d.y1) - (y(0) - y(d.value));
+        //console.log(height_diff);
+        y_corrected = y(d.y1) + height_diff;
+        d.y_corrected = y_corrected //store in d for later use in restorePlot()
+
+        //if (d.name === "JP Sales") height_diff = 0; //reset for next d.mystate
+        //if (d.name === "EU Sales") y_corrected = height - (y(d.y0) - y(d.y1));
+        if (d.name === keys[0]) y_corrected = height - (y(d.y0) - y(d.y1));
+          
+        //return y_corrected;
+        return y(d.y1);  //orig, but not accurate  
+      })
+      .attr("x",function(d) { //add to stock code
+          return x(d.currentScore)
+        })
+      .attr("height", function(d) {
+        return y(d.y0) - y(d.y1); //heights calculated based on stacked values (inaccurate)
+        //return y(0) - y(d.value); //calculate height directly from value in csv file
+      })
+      .attr("class", function(d) {        
+        classLabel = d.name.replace(/\s/g, ''); //remove spaces
+        return "bars class" + classLabel;
+      })
+      .style("fill", function(d) {   
+        return color(d.name); 
+    });
+      
+    annotations.map(annotation => addAnnotation(annotation));
+
+      score.selectAll("rect")
+       .on("mouseover", function(d){
+            //d3.select(this.parentNode).selectAll("rect").classed("bar-fade", true);
+
+        //   var delta = d.y1 - d.y0;
+        //   var xPos = parseFloat(d3.select(this).attr("x"));
+        //   var yPos = parseFloat(d3.select(this).attr("y"));
+        //   var height = parseFloat(d3.select(this).attr("height"))
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 0.9);
+
+          ////d3.select(this).classed("bar-highlight", true);
+
+        //   svg.append("text")
+        //   .attr("x",xPos)
+        //   .attr("y",yPos +height/2)
+        //   .attr("class","tooltip")
+        //   .text(d.name +": "+ delta); 
+          
+       })
+       .on("mousemove", function(d) {
+                const tooltipString = "<div><div style='text-align: center; color:" + color(d.name) + "'>" + d.name+ "</div>"
+                                    + "<table>"
+                                    + "<tr>"
+                                    + "<td class='table-key'>Global Sales:</td>"
+                                    + "<td class='table-value'>" + d3.format(".5")(d.value) + " million units</td>"
+                                    + "</tr><tr>"
+                                    + "<td class='table-key'>%Total:</td>"
+                                    + "<td class='table-value'>" + d3.format(".3")(d.value/d.total*100) + "%</td>"
+                                    + "</tr></table></div>"
+                //console.log(z(d[2]));
+                tooltip.html(tooltipString)
+                .style("left", (d3.event.pageX + 12) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+          })	
+       .on("mouseout",function(d){
+        //d3.select(this).style("fill",color(d.name));
+        tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+          //svg.select(".tooltip").remove();
+          //d3.select(this).attr("stroke","pink").attr("stroke-width",0.2);
+          //d3.select(this.parentNode).style("opacity", 1.0);
+          //d3.select(this.parentNode).selectAll("rect").classed("bar-fade", false);
+          
+          ////d3.select(this).classed("bar-highlight", false);
+                                
+        });
+
+
+    var legend = svg.selectAll(".legend")
+      .data(color.domain().slice().reverse())
     .enter().append("g")
+      .attr("class", function (d) {
+        legendClassArray.push(d.replace(/\s/g, '')); //remove spaces
+        legendClassArray_orig.push(d); //remove spaces
+        return "legend";
+      })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  legend.append("rect")
-      .attr("x", width + 20)
-      .attr("width", 19)
-      .attr("height", 19)
-      .attr("fill", z);
+  //reverse order to match order in which bars are stacked    
+  legendClassArray = legendClassArray.reverse();
+  legendClassArray_orig = legendClassArray_orig.reverse();
 
-  legend.append("text")
-      .attr("text-anchor", "start")
-      .attr("x", width + 45)
-      .attr("y", 9.5)
-      .attr("dy", "0.32em")
+  
+  legend.append("rect")
+      .attr("x", width +20)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color)
+      .attr("id", function (d, i) {
+        return "id" + d.replace(/\s/g, '');
+      })
+      .on("mouseover",function(){        
+
+        if (active_link === "0") d3.select(this).style("cursor", "pointer");
+        else {
+          if (active_link.split("class").pop() === this.id.split("id").pop()) {
+            d3.select(this).style("cursor", "pointer");
+          } else d3.select(this).style("cursor", "auto");
+        }
+      })
+      .on("click",function(d){        
+        if (enableFilter) {
+        if (active_link === "0") { //nothing selected, turn on this selection
+          d3.select(this)           
+            .style("stroke", "black")
+            .style("stroke-width", 2);
+
+            active_link = this.id.split("id").pop();
+            plotSingle(this);
+
+            //gray out the others
+            for (i = 0; i < legendClassArray.length; i++) {
+              if (legendClassArray[i] != active_link) {
+                d3.select("#id" + legendClassArray[i])
+                  .style("opacity", 0.5);
+              } else sortBy = i; //save index for sorting in change()
+            }
+
+           
+        } else { //deactivate
+          if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
+            d3.select(this)           
+              .style("stroke", "none");
+            
+            //restore remaining boxes to normal opacity
+            for (i = 0; i < legendClassArray.length; i++) {              
+                d3.select("#id" + legendClassArray[i])
+                  .style("opacity", 1);
+            }
+
+            
+            //disable sort checkbox
+            d3.select("label")
+              .style("color", "#D8D8D8")
+              .select("input")
+              .property("disabled", true)
+              .property("checked", false);   
+
+
+            //sort bars back to original positions if necessary
+            //change();            
+
+            //y translate selected category bars back to original y posn
+            restorePlot(d);
+
+            active_link = "0"; //reset
+          }
+
+        } //end active_link check 
+      }                         
+      });
+
+legend.append("text")
+      .attr("x", width + 44)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("font-size", 12)
+      .style("text-anchor", "begin")
       .text(function(d) { return d; });
 
-  var legendTitle = g.append("text")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 12)
-      .attr("font-weight", 800)
-      .attr("x", width+20)
-      .attr("y", -10)
-      .text("Genre");
+  // restore graph after a single selection
+  function restorePlot(d) {
+    //restore graph after a single selection
+    d3.selectAll(".bars:not(.class" + class_keep + ")")
+          .transition()
+          .duration(1000)
+          .delay(function() {
+            //if (restoreXFlag) return 3000;
+            //else return 750;
+            return 750;
+          })
+          .attr("width", x.bandwidth()) //restore bar width
+          .style("opacity", 1);
 
+    //translate bars back up to original y-posn
+    d3.selectAll(".class" + class_keep)
+      .attr("x", function(d) { return x(d.currentScore); })
+      .transition()
+      .duration(1000)
+      .delay(function () {
+        //if (restoreXFlag) return 2000; //bars have to be restored to orig posn
+        //else return 0;
+        return 0;
+      })
+      .attr("y", function(d) {
+        return y(d.y1); //not exactly correct since not based on raw data value
+        //return d.y_corrected; 
+      });
+    
+  }
+
+  // plot only a single legend selection
+  function plotSingle(d) {
+    //console.log(d);
+    class_keep = d.id.split("id").pop();
+    idx = legendClassArray.indexOf(class_keep);    
+
+    //erase all but selected bars by setting opacity to 0
+    d3.selectAll(".bars:not(.class" + class_keep + ")")
+          .transition()
+          .duration(1000)
+          .attr("width", 0) // use because svg has no zindex to hide bars so can't select visible bar underneath
+          .style("opacity", 0);
+
+    //lower the bars to start on x-axis  
+    score.selectAll("rect").nodes().forEach(function (d, i) {        
+    
+        //console.log(d3.select(d).attr("class"));
+        const currentClass = d3.select(d).attr("class");
+    //get height and y posn of base bar and selected bar
+    if (currentClass.indexOf(class_keep) !== -1) {
+    h_keep = d3.select(d).attr("height");
+    y_keep = d3.select(d).attr("y");  
+      //reposition selected bars
+      d3.select(d)
+        .transition()
+        .ease(d3.easeBounce)
+        .duration(1000)
+        .delay(750)
+        .attr("y", height - h_keep);
+
+    }
+    })
+  }
 });
+
+// function setOpacity(className, opacityValue) {
+//     svg.selectAll(`.${className}`).style("opacity", opacityValue);
+// }
+
+function addAnnotation(dataStore) {
+svg.append("rect")
+    .attr("class", `annotation${dataStore.annotationNumber}`)
+    .style("stroke-width", 1)
+    .style("stroke", "black")
+    .style("fill", "white")
+    .style("fill-opacity", 1.0)
+    //.attr("x", width/4)
+    .attr("x",dataStore.rectX)
+    //.attr("y", 70)
+    .attr("y", dataStore.rectY)
+    //.attr("width", 500)
+    .attr("width", dataStore.rectWidth)
+    //.attr("height", 100)
+    .attr("height", dataStore.rectHeight)
+
+svg.append("text")
+    .attr("class", `annotation${dataStore.annotationNumber}`)
+    //.style("text-anchor", "end")
+    //.attr("x", width/4 + 5)
+    .attr("x", dataStore.rectX + 5)
+    //.attr("y", 90)
+    .attr("y", dataStore.rectY + 20)
+    .attr("width", dataStore.rectWidth)
+    .style("white-space", "wrap")
+    //.style("font-size", 14)
+    .style("font-size", dataStore.textFontSize)
+    .text(dataStore.textValue);
+
+//line              
+svg.append("line")
+   .attr("class", `annotationArrow`)
+  //.attr("x1", 400)
+  .attr("x1", dataStore.rectX + dataStore.rectWidth/2)
+  //.attr("y1", 250)
+  .attr("y1", dataStore.rectY + dataStore.rectHeight)
+  //.attr("x2", 500)
+  .attr("x2", dataStore.lineEndX)
+  //.attr("y2", 300)
+  .attr("y2", dataStore.lineEndY)
+  .attr("stroke-width", 1)
+  .attr("stroke", "black")
+  .attr("marker-end", "url(#triangle)");
+
+svg.append("svg:defs").append("svg:marker")
+    .attr("class", `annotationArrow`)
+    .attr("id", "triangle")
+    .attr("refX", 6)
+    .attr("refY", 6)
+    .attr("markerWidth", 30)
+    .attr("markerHeight", 30)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M 0 0 12 6 0 12 3 6")
+    .style("fill", "black");
+}
+
+var _transitions = [
+      {
+        transitionForward: () => {
+          d3.selectAll('.annotation1')
+            .style('opacity', 1)
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 1);
+          enableFilter = false;
+        },
+        transitionBackward: () => {
+          d3.selectAll('.annotation1')
+            .style('opacity', 0)
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 0);
+            enableFilter = true;
+        },
+        index: 0
+      },
+      {
+        transitionForward: () => {
+          d3.selectAll('.annotation2')
+            .style('opacity', 1.0)
+          d3.selectAll('.annotation1')
+            .style('opacity', 0)
+        },
+        transitionBackward: () => {
+          d3.selectAll('.annotation1')
+            .style('opacity', 1)
+          d3.selectAll('.annotation2')
+            .style('opacity', 0);
+        },
+        index: 1
+      },
+      {
+        transitionForward: () => {
+          d3.selectAll('.annotation2')
+            .style('opacity', 0)
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 0)
+          d3.selectAll('.annotation3')
+            .style('opacity', 1)
+            enableFilter = true;
+        },
+        transitionBackward: () => {
+          d3.selectAll('.annotation2')
+            .style('opacity', 1)
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 1)
+          d3.selectAll('.annotation3')
+            .style('opacity', 0)
+            enableFilter = false;
+        },
+        index: 2
+      }
+    ]
 
 </script>

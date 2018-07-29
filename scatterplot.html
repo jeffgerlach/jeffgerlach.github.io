@@ -34,12 +34,63 @@
         .table-value {
             font-weight:600;
         }
+        svg {
+          width: 100%;
+          align-content: center;
+        }
+      .annotation0 {
+        opacity: 1.0;
+      }
+      .annotation1 {
+        opacity: 0.0;
+      }
+      .annotation2 {
+          opacity: 0.0;
+      }
+      .annotation3 {
+          opacity: 0.0;
+      }
+      .annotationLine0 {
+        opacity: 0.0;
+      }
+      .annotationLine1 {
+        opacity: 0.0;
+      }
+      .annotationLine2 {
+        opacity: 0.0;
+      }
+      .annotationLine3 {
+        opacity: 0.0;
+      }
+      .circle0 {
+        opacity: 0.0;
+      }
+      .circle1 {
+        opacity: 0.0;
+        fill: none;
+        stroke: black;
+      }
+      .circle2 {
+        opacity: 0.0;
+        fill: none;
+        stroke: black;
+      }
+      .circle3 {
+        opacity: 0.0;
+      }
+      .annotationArrow {
+        opacity: 0.0;
+      }
     </style>
 </head>
 <body>
 
     <script src="//d3js.org/d3.v4.min.js"></script>
     <script>
+       var enableZoom = false;
+       var isZoomed = false;
+       var enableLegend = false;
+      function runPlot () {
         d3.tsv("./VG_sales_2016.csv") 
         .row(function(d) {
           return {
@@ -56,8 +107,44 @@
         var border=1;
         var bordercolor='black';
         var margin = { top: 50, right: 150, bottom: 50, left: 50 };
-        width = 1000 - margin.left - margin.right,
-        height = 800 - margin.top - margin.bottom;
+        let width = 1000 - margin.left - margin.right;
+        let height = 600 - margin.top - margin.bottom;
+        //width = window.innerWidth - margin.left - margin.right;
+        //height = Math.min(600, window.innerHeight); - margin.top - margin.bottom;
+
+
+            //annotations
+const annotation1 = {
+        annotationNumber: 1,
+        rectX: 50,
+        rectY: 10,
+        rectWidth: 370,
+        rectHeight: 30,
+        textFontSize: 14,
+        lineEndX: 580,
+        lineEndY: 80,
+        ellipse: true,
+        circleX: 550,
+        circleY: 70,
+        circleR: 120,
+        ellipseRX: 240,
+        ellipseRY: 67,
+        textValue: "A few outliers in the E(6+) rating skew the sales numbers"
+    };
+    const annotation0 = { ...annotation1, annotationNumber: 0, rectWidth: 390,
+      textValue: "Here we can see general sales trends based on critic scores"};
+    const annotation2 = { ...annotation1, annotationNumber: 2, rectWidth: 360, lineEndX: 550, lineEndY: 220,
+      ellipse: false, circleX: 660, circleY: 240, circleR: 130, //ellipseRX: 200, ellipseRY: 200,
+      textValue: "Mature games seem to trend to higher ratings and sales"};
+    const annotation3 = { ...annotation1, annotationNumber: 3, rectWidth: 280,
+    textValue: "Feel free to explore the interactive dataset"};
+
+    const annotations = [
+        annotation0,
+        annotation1,
+        annotation2,
+        annotation3
+    ];
 
         var tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -78,10 +165,12 @@
         var brush = d3.brush().extent([[0, 0], [width, height]]).on("end", brushended),
             idleTimeout,
             idleDelay = 350;
-     
+        globalBrush = brush;
         var svg = d3.select("body").append("svg")
-                    .attr("width", width + margin.left + margin.right)
+                    //.attr("width", width + margin.left + margin.right)
+                    .attr("width", "100%")
                     .attr("height", height + margin.top + margin.bottom)
+                    .attr("id", "plotsvg")
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -165,6 +254,8 @@
                 .duration(500)
                 .style("opacity", 0);
         });
+
+        annotations.map(annotation => addAnnotation(annotation));
         
         // x axis
         svg.append("g")
@@ -227,6 +318,7 @@
               return d;
             });
 
+        if (enableLegend) {
           var currentlyActiveRating;
           legend.on('click', function(ageRating){
 			          d3.selectAll('.dot')
@@ -244,7 +336,7 @@
                     currentlyActiveRating = ageRating;
                   }
                 })
-                
+        
         legend.on("mouseover", function(ageRating) {
           if (!currentlyActiveRating) {
             d3.selectAll('.dot')
@@ -260,22 +352,27 @@
             .style('opacity', 1.0)
           }
         });
+      }
 
         function brushended() {
-
             var s = d3.event.selection;
+        
             if (!s) {
                 if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
                 x.domain(d3.extent(data, function (d) { return d.metacritic_score; })).nice();
                 //y.domain(d3.extent(data, function (d) { return d.global_sales; })).nice();
                 y.domain([0.007, 100]);
+                isZoomed = false;
             } else {
                 
                 x.domain([s[0][0], s[1][0]].map(x.invert, x));
                 y.domain([s[1][1], s[0][1]].map(y.invert, y));
                 scatter.select(".brush").call(brush.move, null);
+                isZoomed = true;
             }
+          if (enableZoom) {
             zoom();
+          }
         }
 
         function idled() {
@@ -283,7 +380,6 @@
         }
 
         function zoom() {
-
             var t = scatter.transition().duration(750);
             svg.select("#axis--x").transition(t).call(xAxis);
             svg.select("#axis--y").transition(t).call(yAxis);
@@ -291,6 +387,208 @@
             .attr("cx", function (d) { return x(d.metacritic_score); })
             .attr("cy", function (d) { return y(d.global_sales); });
         }
+
+        function addAnnotation(dataStore) {
+
+    svg.append(`${dataStore.ellipse ? "ellipse" : "circle"}`)
+    .attr("class", `circle${dataStore.annotationNumber}`)
+    .attr("cx", dataStore.circleX)
+    .attr("cy", dataStore.circleY)
+    .attr("r", dataStore.circleR)
+    .attr("rx", dataStore.ellipseRX)
+    .attr("ry", dataStore.ellipseRY);
+svg.append("rect")
+    .attr("class", `annotation${dataStore.annotationNumber}`)
+    .style("stroke-width", 1)
+    .style("stroke", "black")
+    .style("fill", "white")
+    .style("fill-opacity", 1.0)
+    //.attr("x", width/4)
+    .attr("x",dataStore.rectX)
+    //.attr("y", 70)
+    .attr("y", dataStore.rectY)
+    //.attr("width", 500)
+    .attr("width", dataStore.rectWidth)
+    //.attr("height", 100)
+    .attr("height", dataStore.rectHeight)
+
+svg.append("text")
+    .attr("class", `annotation${dataStore.annotationNumber}`)
+    //.style("text-anchor", "end")
+    //.attr("x", width/4 + 5)
+    .attr("x", dataStore.rectX + 5)
+    //.attr("y", 90)
+    .attr("y", dataStore.rectY + 20)
+    .attr("width", dataStore.rectWidth)
+    .style("white-space", "wrap")
+    //.style("font-size", 14)
+    .style("font-size", dataStore.textFontSize)
+    .text(dataStore.textValue);
+
+//line              
+svg.append("line")
+   .attr("class", `annotationLine${dataStore.annotationNumber}`)
+  //.attr("x1", 400)
+  .attr("x1", dataStore.rectX + dataStore.rectWidth/2)
+  //.attr("y1", 250)
+  .attr("y1", dataStore.rectY + dataStore.rectHeight)
+  //.attr("x2", 500)
+  .attr("x2", dataStore.lineEndX)
+  //.attr("y2", 300)
+  .attr("y2", dataStore.lineEndY)
+  .attr("stroke-width", 1)
+  .attr("stroke", "black")
+  .attr("marker-end", "url(#triangle)");
+
+svg.append("svg:defs").append("svg:marker")
+    .attr("class", `annotationArrow`)
+    .attr("id", "triangle")
+    .attr("refX", 6)
+    .attr("refY", 6)
+    .attr("markerWidth", 30)
+    .attr("markerHeight", 30)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M 0 0 12 6 0 12 3 6")
+    .style("fill", "black");
+}
       });
+}
+runPlot();
+      var _transitions = [
+      {
+        transitionForward: () => {
+          d3.selectAll('.dot')
+            .style('opacity', 0.0)
+            .filter(function(d){
+                return d.age_rating == "Everyone (6+)";
+                    })
+            .style('opacity', 1);
+
+            d3.selectAll('.annotation0')
+            .style('opacity', 0)
+            d3.selectAll('.annotation1')
+            .style('opacity', 1)
+            d3.selectAll('.annotationLine1')
+            .style('opacity', 1);
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 1)
+          d3.selectAll('.circle1')
+            .style('opacity', 1)
+        },
+        transitionBackward: () => {
+          d3.selectAll('.dot')
+            .style('opacity', 1.0);
+            d3.selectAll('.annotation0')
+            .style('opacity', 1)
+          d3.selectAll('.annotation1')
+            .style('opacity', 0)
+          d3.selectAll('.annotationLine1')
+            .style('opacity', 0);
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 0);
+            d3.selectAll('.circle1')
+            .style('opacity', 0)
+        },
+        index: 0
+      },
+      {
+        transitionForward: () => {
+          d3.selectAll('.dot')
+            .style('opacity', 0.0)
+            .filter(function(d){
+                return d.age_rating == "Mature (17+)";
+                    })
+            .style('opacity', 1);
+            d3.selectAll('.annotation1')
+            .style('opacity', 0)
+            d3.selectAll('.annotationLine1')
+            .style('opacity', 0);
+            d3.selectAll('.circle1')
+            .style('opacity', 0)
+            d3.selectAll('.annotation2')
+            .style('opacity', 1);
+            d3.selectAll('.annotationLine2')
+            .style('opacity', 1);
+            d3.selectAll('.circle2')
+            .style('opacity', 1)
+        },
+        transitionBackward: () => {
+          d3.selectAll('.dot')
+            .style('opacity', 0.0)
+            .filter(function(d){
+                return d.age_rating == "Everyone (6+)";
+                    })
+            .style('opacity', 1);
+
+            d3.selectAll('.annotation1')
+            .style('opacity', 1)
+            d3.selectAll('.annotationLine1')
+            .style('opacity', 1);
+            d3.selectAll('.circle1')
+            .style('opacity', 1)
+            d3.selectAll('.annotation2')
+            .style('opacity', 0);
+            d3.selectAll('.annotationLine2')
+            .style('opacity', 0);
+            d3.selectAll('.circle2')
+            .style('opacity', 0)
+        },
+        index: 1
+      },
+      {
+        transitionForward: () => {
+          d3.selectAll('.dot')
+            .style('opacity', 1.0);
+
+            d3.selectAll('.annotation2')
+            .style('opacity', 0)
+            d3.selectAll('.annotationLine2')
+            .style('opacity', 0);
+            d3.selectAll('.circle2')
+            .style('opacity', 0)
+            d3.selectAll('.annotationArrow')
+            .style('opacity', 0)
+            d3.selectAll('.annotation3')
+            .style('opacity', 1);
+
+            enableZoom = true;
+            enableLegend = true;
+        },
+        transitionBackward: async () => {
+          if (isZoomed) {
+          d3.select("svg").remove();
+          await runPlot();
+          }
+          setTimeout(() => {
+          d3.selectAll('.dot')
+            .style('opacity', 0.0)
+            .filter(function(d){
+                return d.age_rating == "Mature (17+)";
+                    })
+            .style('opacity', 1);
+
+            d3.selectAll('.annotation2')
+            .style('opacity', 1)
+            d3.selectAll('.annotationLine2')
+            .style('opacity', 1);
+            d3.selectAll('.annotationArrow')
+            .style('opacity', 1)
+            d3.selectAll('.circle2')
+            .style('opacity', 1)
+            d3.selectAll('.annotation3')
+            .style('opacity', 0);
+            
+            d3.selectAll('.annotation0')
+            .style('opacity', 0)
+            enableZoom = false;
+            enableLegend = false;
+          }, 500);
+
+        },
+        index: 2
+      }
+    ]
+
     </script>
 </body>

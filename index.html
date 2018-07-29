@@ -3,7 +3,58 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<style>
+.essay-column {
+    float: left;
+		width: 33%;
+}
 
+/* Clear floats after the columns */
+.essay-row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.myButton {
+	-moz-box-shadow: 0px 10px 14px -7px #276873;
+	-webkit-box-shadow: 0px 10px 14px -7px #276873;
+	box-shadow: 0px 10px 14px -7px #276873;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #599bb3), color-stop(1, #408c99));
+	background:-moz-linear-gradient(top, #599bb3 5%, #408c99 100%);
+	background:-webkit-linear-gradient(top, #599bb3 5%, #408c99 100%);
+	background:-o-linear-gradient(top, #599bb3 5%, #408c99 100%);
+	background:-ms-linear-gradient(top, #599bb3 5%, #408c99 100%);
+	background:linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#599bb3', endColorstr='#408c99',GradientType=0);
+	background-color:#599bb3;
+	-moz-border-radius:8px;
+	-webkit-border-radius:8px;
+	border-radius:8px;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:20px;
+	font-weight:bold;
+	padding:13px 32px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #3d768a;
+}
+.myButton:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #408c99), color-stop(1, #599bb3));
+	background:-moz-linear-gradient(top, #408c99 5%, #599bb3 100%);
+	background:-webkit-linear-gradient(top, #408c99 5%, #599bb3 100%);
+	background:-o-linear-gradient(top, #408c99 5%, #599bb3 100%);
+	background:-ms-linear-gradient(top, #408c99 5%, #599bb3 100%);
+	background:linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#408c99', endColorstr='#599bb3',GradientType=0);
+	background-color:#408c99;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+</style>
 		<title>Data Visualization Final Project</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
@@ -31,39 +82,296 @@
 
 
 							Jeff Gerlach
+							<button class="myButton" onclick="Reveal.down()" style="margin-top: 150px">About This Visualization</button>
 						</textarea>
 					</section>
-					<section data-markdown>
-							<textarea data-template>
-									Essay
-								</textarea>
+<section>
+<h5>About This Visualization</h5>
+<div class="essay-row">
+		<div class="essay-column" style="text-align: left">
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 0px">Overview:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+This visualization attempts to explore the question: Do better critical reviews of video games result in 
+increased sales numbers and does a game's age rating play any role in total sales?
+The slides guide the reader in an attempt to answer this question, along with provide other views of the 
+data so they may reach their own conclusions.
+</p>
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Narrative Visualization Structure:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+This visualization uses the hybrid interactive slideshow structure with scenes, annotations, parameters, and 
+triggers on each slide. The javascript framework reveal.js, along with similarly structured charts using d3.js 
+v4 (and no external libraries) are used to provide visual consistency between scenes. You can either use the 
+arrows on the keyboard or click the left/right/down/up arrows on the bottom right of each slide to transition 
+through the trigger points on each scene. The second scene allows the user to click/press the down arrow to 
+drill further down into different groupings of the sales data for further exploration. The arrow buttons in the 
+lower right will blink and move to inform the user that they can be used for navigation.
+</p>
+
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Scenes:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+As mentioned previously, the scenes in this visualization were set up using the reveal.js framework in order to 
+maintain visual consistency and not disorient the reader. The common theme is a few guided annotations for each 
+chart followed by opening up the chart for reader exploration. The scatter plot allows for left/right transitions 
+and the stacked bar charts allow for left/right transitioning to process through annotations in a single chart to 
+the final opening up for exploration. After guiding the reader from the scatter plot to a transformed bar chart 
+representation to more easily see trends (grouped by age rating), the bar chart slide also allows for the reader 
+to drill down (using the up/down arrow or buttons) to view other aggregations of the data - sales by region, 
+console platform, and game genre binned into Metacritic aggregate review bars.
+</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+The first scene is a scatterplot showing an overview of the entire dataset that was used for this project - sales
+data for video games from 1980 to 2016 versus Metacritic aggregate review score, visually grouped by age rating 
+using different colors. 
+</p>
+</div>
+<div class="essay-column" style="text-align: left">
+		<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+				Due to the presence of a few outlier values, a log scale for sales was used to spread 
+				out the points for easier viewing.
+		</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+Manual zooming and filtering is initially disabled while the reader is stepped through some annotations 
+to highlight some trends in the data (using triggers provided by using the left/right arrow keys), but on 
+the final transition for the scatter plot (with an accompanying annotation) the user can zoom (using mouse drags) 
+and filter (clicking on the legend) on their own to explore the data, hovering over the points for detailed tooltip 
+information which provide all of the data provided in this data set.
+</p>
+<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+The second scene is a stacked bar chart collapsing all of the data from the scatter plot of game sales vs. 
+Metacritic score (grouped by age rating) for ease of seeing trends, as there are a very large number of data 
+points in the scatter plot. Filtering is disabled as the reader is guided through a few annotations (triggered 
+and cleared using the left/right arrow keys) until the final transition, where the reader is free to explore the 
+data by hovering over the bars to bring up a tooltip and to click on the legend to filter the data. In this scene, 
+the reader is allowed to drill down (using up/down buttons or keys) to further scenes which closely follow the second 
+scene but group the data by different categories seen in the scatter plot data - sales by region, console platform, 
+and game genre also all binned into Metacritic score ranges as stacked bar charts. The annotations, parameters, and 
+triggers follow from the second scene.
+</p>
+
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Annotations:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+The annotations use combinations of SVG rectangles, circles, ellipses, lines, and arrows drawn using d3 with the 
+similar styling and text size to provide visual consistency in each scene and highlight trends in the data. The 
+annotations in each scene change based on the triggers of transitioning using the arrow keys/clicks, which will 
+clear old annotations and add new ones based on the current view of the data in place (all of the annotations are 
+independent of one another and are controlled by changing opacity on each of the slide transitions). The final 
+annotation of each scene/chart informs the user that they are open to explore the data using the corresponding 
+zooming and filtering options. Hovering over scatter plot points or bars on the bar charts will display tooltips 
+with more data.
+</p>
+</div>
+<div class="essay-column" style="text-align: left">
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Parameters:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+The driving parameter in each of the scenes and charts is the groupings of the data in question. In the scatter 
+plot (first scene) and first stacked bar chart (second scene) the parameter is Age Rating using the US’s ESRB rating 
+system (Everyone 6+ years old, Everyone 10+ years old, Teen (13+ years old), Mature (17+ years old), and Adults 
+Only (18+ years old). Using the left/right arrow keys in each chart will auto filter the data and provide annotations 
+to highlight interesting observations before being cleared on the final transition in each chart to allow the reader 
+to manually filter based on the parameter. In the following scenes (reached by pressing/clicking down on the 2nd 
+scene), the parameters are: Sales Region (North America, EU, Japan, and Other), Console Platform (Xbox, Playstation, 
+etc), and Game Genre (Action, Sports, Shooter, etc). 
+</p>
+
+<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">Triggers:</p>
+<p style="font-size: 11px; margin-top: 0px; margin-bottom: 0px;">
+Triggers are implemented in this visualization mainly through the use of the arrow keys/arrow buttons (provided by 
+reveal.js in the lower right of each slide) along with the ability to click on the legends of each chart on the final 
+transition of each scene to filter the data by grouping, which allows for further exploration of the data. The scatter 
+plot triggers filter the sales data by age rating and display annotations on the plot to highlight interesting data. 
+The final transition of the scatterplot in the first scene allows the reader to click and drag to select a window to 
+trigger a zoom in addition to filtering the data through the legend.
+</p>
+<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+The transitions on the bar chart scenes also 
+filter the sales data by the grouping detailed on the chart (switching from a stacked bar chart to a regular bar 
+chart) allowing for observations of trends without obfuscation from the stacking on the chart. The bar chart 
+triggers also present different annotations to highlight observations in the data to the reader. The reveal.js 
+arrows will blink and move to alert the user they are available, and various text annotations in the slide also 
+inform the user how to activate the triggers.
+</p>
+
+</div>
+					</section>
+					<section>
+							<p style="font-size: 18px; font-weight: 600">Data Source:</p>
+							<p style="font-size: 14px">
+								<a href="https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings">
+									https://www.kaggle.com/rush4ratio/video-game-sales-with-ratings
+							</a>
+							</p>
+							
+							
+							<p style="font-size: 18px; font-weight: 600; margin-bottom: 0px">Tools:</p>
+							<a href="https://d3js.org" style="font-size: 16px; margin-top: 0px">https://d3js.org/</a>
+							<br />
+							<a href="https://revealjs.com/" style="font-size: 16px; margin-top: 0px">https://revealjs.com/</a>
+							
+							
+							<p style="font-size: 18px; font-weight: 600">Notice:</p>
+							<p style="font-size: 14px">
+							This visualization is intended to be viewed on Chrome (recommended), Firefox, or Safari with a minimum resolution of 1000 x 600 pixels - a smaller viewport could cause display issues (if you do resize your window, try refreshing the page to re-render with the new size) .
+							</p>
+
 					</section>
 				</section>
 				<section>
-					<h3>Scatterplot</h3>
-					<div style="width: 1000px; height: 800px; margin-left: 160px;" class="fig-container" data-file="./scatterplot.html"></div>
-				</section>
-				<section>
-						<h3>Regional Sales</h3>
-						<div style="height: calc(100vh); margin-top: 40px; margin-left: 135px;" class="fig-container" data-file="./barchart_regional.html"></div>
+					<div class="essay-row">
+						<div style="width: 20%; float: left;">
+							<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
+								<u>Overview</u>
+							</p>
+							<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+								This scatter plot gives a high level overview, including the entire dataset that was pulled
+								from Kaggle. Due to the wide spread of sales (mostly due to a few outliers), a logarithmic scale
+								is used on the y-axis. Click the right button on the bottom right (or press the right arrow key) 
+								to progress, left arrow (or key) to backtrack. 
+							</p>
+							<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+								Metacritic scores are retrieved from a website (www.metacritic.com) that aggregates multiple games
+								journalists' review scores for a game and normalizes them on a scale from 1 to 100. This data is
+								grouped by age rating, which is assigned using the ESRB rating system in use in the USA.
+							</p>
+							<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+								Once the chart indicates you can explore, you will be able to zoom (by clicking and dragging a 
+								box with the mouse) and filter the data using the legend. Hover over a data point for more details.
+							</p>
+							<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+									Type '?' on your keyboard for slide control help, or "o" for an overview of the presentation.
+								</p>
+						</div>
+						<div style="height: 1000px; width: 80%; float: right;" class="fig-container" data-file="./scatterplot.html"></div>
+					</div>
 				</section>
 				<section>
 					<section>
-						<h3>Age Rating</h3>
-						<div style="height: calc(100vh); margin-top: 40px; margin-left: 135px;" class="fig-container" data-file="./barchart_age.html"></div>
+							<div class="essay-row">
+									<div style="width: 20%; float: left;">
+										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
+											<u>Age Rating</u>
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+											This stacked bar chart collects the data from the previous scatter plot and sums the sales numbers
+											by 5-point Metacritic score bins to reduce the number of bars and make it easier to spot trends.
+											Click the right button on the bottom right (or press the right arrow key) to progress. Left arrow 
+											(or key) to backtrack. 
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+											This data is grouped by age rating, which is assigned using the ESRB rating system in use in 
+											the USA. A tailed normal distribution in sales data when plotted against Metacritic score
+											is an interesting takeaway. Another is the high level of Mature rated games with higher scores.
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+											Once the chart indicates you can explore, you will be able to filter the data using the legend.
+											Hover over a bar for more details in the form of a tooltip. If you would like to continue
+											exploring this dataset, click the down button or press the down arrow key for further charts.
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												Type '?' on your keyboard for slide control help, or "o" for an overview of the presentation.
+											</p>
+									</div>
+							<div style="height: 1000px; width: 80%; float: right;" class="fig-container" data-file="./barchart_age.html"></div>
+						</div>
 					</section>
 					<section>
-						<h3>Platform</h3>
-						<div style="height: calc(100vh); margin-top: 40px; margin-left: 135px;" class="fig-container" data-file="./barchart_platform.html"></div>
+							<div class="essay-row">
+									<div style="width: 20%; float: left;">
+										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
+											<u>Regional Sales</u>
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+												This stacked bar chart collects the data from the previous scatter plot and sums the sales numbers
+												by 5-point Metacritic score bins to reduce the number of bars and make it easier to spot trends.
+												Click the right button on the bottom right (or press the right arrow key) to progress. Left arrow 
+												(or key) to backtrack. 
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												This data is grouped by regional sales, which in this data set was split into North America,
+												European Union, Japan and Other. The tailed normal distribution in sales data when plotted against 
+												Metacritic score is obviously still present. We can see that North America accounts for nearly half 
+												of all game sales, and that each of the divisions follow the same normal distribution.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												Once the chart indicates you can explore, you will be able to filter the data using the legend.
+												Hover over a bar for more details in the form of a tooltip.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+													Type '?' on your keyboard for slide control help, or "o" for an overview of the presentation.
+												</p>
+										</div>
+							<div style="height: 1000px; width: 80%; float: right;" class="fig-container" data-file="./barchart_regional.html"></div>
+						</div>
 					</section>
 					<section>
-						<h3>Genre</h3>
-						<div style="height: calc(100vh); margin-top: 40px; margin-left: 135px;" class="fig-container" data-file="./barchart_genre.html"></div>
+							<div class="essay-row">
+									<div style="width: 20%; float: left;">
+										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
+											<u>Platform</u>
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+												This stacked bar chart collects the data from the previous scatter plot and sums the sales numbers
+												by 5-point Metacritic score bins to reduce the number of bars and make it easier to spot trends.
+												Click the right button on the bottom right (or press the right arrow key) to progress. Left arrow
+												(or key) to backtrack. 
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												This data is grouped by console platform, covering the majority of the major gaming platforms
+												from the late 90s and up (PC data goes back to the 80's). The tailed normal distribution in sales 
+												data when plotted against Metacritic score is obviously still present. We can see that a few of the more
+												recent dominant platforms cover the majority of sales, namely the Playstation and Xbox console series.
+												We can also see that most of the consoles seem to also follow a tailed normal distribution for sales,
+												other than the handheld systems (DS, 3DS, Playstation Portable, and Vita) which seem to be a lot more
+												flat in sales in the higher Metacritic score bins.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												Once the chart indicates you can explore, you will be able to filter the data using the legend.
+												Hover over a bar for more details in the form of a tooltip. Click the down arrow or press the
+												down arrow key to explore the data even further.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+													Type '?' on your keyboard for slide control help, or "o" for an overview of the presentation.
+												</p>
+										</div>
+						<div style="height: 1000px; width: 80%; float: right;" class="fig-container" data-file="./barchart_platform.html"></div>
+						</div>
+					</section>
+					<section>
+							<div class="essay-row">
+									<div style="width: 20%; float: left;">
+										<p style="font-size: 11px; font-weight: 600; margin-bottom: 0px; margin-top: 5px">
+											<u>Genre</u>
+										</p>
+										<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px;">
+												This stacked bar chart collects the data from the previous scatter plot and sums the sales numbers
+												by 5-point Metacritic score bins to reduce the number of bars and make it easier to spot trends.
+												Click the right button on the bottom right (or press the right arrow key) to progress. Left arrow
+												(or key) to backtrack. 
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												This data is grouped by game genre, which in this data set was split into the groupings seen,
+												in the legend on the right. The tailed normal distribution in sales data when plotted against 
+												Metacritic score is obviously still present. We can see that a few genres are more prevalent 
+												(namely Sports, Shooter, Action, and Racing), and that most of the divisions follow the same 
+												normal distribution. Misc category games seem to have their distribution shifted towards lower
+												scores. A surprising find here is the Action games do not seem to tail off at higher Metacritic 
+												scores like the rest of the categories.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+												Once the chart indicates you can explore, you will be able to filter the data using the legend.
+												Hover over a bar for more details in the form of a tooltip.
+											</p>
+											<p style="font-size: 11px; margin-top: 5px; margin-bottom: 0px; margin-top: 20px;">
+													Type '?' on your keyboard for slide control help, or "o" for an overview of the presentation.
+												</p>
+										</div>
+							<div style="height: 1000px; width: 80%; float: right;" class="fig-container" data-file="./barchart_genre.html"></div>
+						</div>
 					</section>
 				</section>
 				<section>
-					<section>Conclusion</section>
-					<section>Final Notes</section>
+					<section>
+						Conclusion
+					</section>
 				</section>
 			</div>
 		</div>
@@ -76,6 +384,7 @@
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
+				runLastState: true,
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
