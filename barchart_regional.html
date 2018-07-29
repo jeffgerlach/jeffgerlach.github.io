@@ -35,7 +35,7 @@ div.tooltip {
   fill: purple !important;
 }
 .annotation1 {
-    opacity: 0.0;
+    opacity: 1.0;
 }
 .annotation2 {
     opacity: 0.0;
@@ -44,7 +44,7 @@ div.tooltip {
     opacity: 0.0;
 }
 .annotationArrow {
-    opacity: 0.0;
+    opacity: 1.0;
 }
 svg {
     width: 100%;
@@ -89,11 +89,11 @@ const annotation1 = {
         textFontSize: 14,
         lineEndX: 725,
         lineEndY: 375,
-        textValue: "North American sales make up around 50% of sales"
+        textValue: "The bulk of sales occur with a score of 80-89"
     };
-    const annotation2 = { ...annotation1, annotationNumber: 2, textValue: "The bulk of sales occur with a score of 80-89"};
+    const annotation2 = { ...annotation1, annotationNumber: 2, 
+      textValue: "North American sales make up around 50% of sales" };
     const annotation3 = { ...annotation1, annotationNumber: 3, textValue: "Click the legend to filter sales regions"};
-    const annotation4 = { ...annotation1, annotationNumber: 3, textValue: "Hover over the bars for more info"};
 
     const annotations = [
         annotation1,
@@ -128,7 +128,7 @@ var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var legendClassArray_orig = []; //orig (with spaces)
 //var sortDescending; //if true, bars are sorted by height in descending order
 
-var enableFilter = true;
+var enableFilter = false;
 
 d3.csv("regional_sales_final.csv", function(error, data) {
   if (error) throw error;
@@ -508,60 +508,80 @@ svg.append("svg:defs").append("svg:marker")
     .style("fill", "black");
 }
 
+var e = document.createEvent('UIEvents');
+e.initUIEvent('click', true, true, window, 1);
+
 var _transitions = [
       {
         transitionForward: () => {
           d3.selectAll('.annotation1')
-            .style('opacity', 1)
-          d3.selectAll('.annotationArrow')
+            .style('opacity', 0);
+          d3.selectAll('.annotation2')
             .style('opacity', 1);
-          enableFilter = false;
+          // d3.selectAll('.annotationArrow')
+          //   .style('opacity', 1);
+            enableFilter = true;
+          d3.select("#idNASales").node().dispatchEvent(e);
+            enableFilter = false;
         },
         transitionBackward: () => {
           d3.selectAll('.annotation1')
-            .style('opacity', 0)
-          d3.selectAll('.annotationArrow')
+            .style('opacity', 1);
+          d3.selectAll('.annotation2')
             .style('opacity', 0);
+          // d3.selectAll('.annotationArrow')
+          //   .style('opacity', 0);
             enableFilter = true;
+          d3.select("#idNASales").node().dispatchEvent(e);
+            enableFilter = false;
         },
         index: 0
       },
       {
         transitionForward: () => {
           d3.selectAll('.annotation2')
-            .style('opacity', 1.0)
-          d3.selectAll('.annotation1')
             .style('opacity', 0)
+          d3.selectAll('.annotation3')
+            .style('opacity', 1);
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 0)
+            enableFilter = true;
+          d3.select("#idNASales").node().dispatchEvent(e);
         },
         transitionBackward: () => {
-          d3.selectAll('.annotation1')
-            .style('opacity', 1)
           d3.selectAll('.annotation2')
+            .style('opacity', 1)
+          d3.selectAll('.annotation3')
             .style('opacity', 0);
+          d3.selectAll('.annotationArrow')
+            .style('opacity', 1)
+            enableFilter = true;
+          d3.select("#idNASales").node().dispatchEvent(e);
+            enableFilter = false;
         },
         index: 1
       },
-      {
-        transitionForward: () => {
-          d3.selectAll('.annotation2')
-            .style('opacity', 0)
-          d3.selectAll('.annotationArrow')
-            .style('opacity', 0)
-          d3.selectAll('.annotation3')
-            .style('opacity', 1)
-            enableFilter = true;
-        },
-        transitionBackward: () => {
-          d3.selectAll('.annotation2')
-            .style('opacity', 1)
-          d3.selectAll('.annotationArrow')
-            .style('opacity', 1)
-          d3.selectAll('.annotation3')
-            .style('opacity', 0)
-            enableFilter = false;
-        },
-        index: 2
-      }
+      // {
+      //   transitionForward: () => {
+      //     d3.selectAll('.annotation2')
+      //       .style('opacity', 0)
+      //     d3.selectAll('.annotationArrow')
+      //       .style('opacity', 0)
+      //     d3.selectAll('.annotation3')
+      //       .style('opacity', 1)
+      //       enableFilter = true;
+      //   },
+      //   transitionBackward: () => {
+      //     d3.selectAll('.annotation2')
+      //       .style('opacity', 1)
+      //     d3.selectAll('.annotationArrow')
+      //       .style('opacity', 1)
+      //     d3.selectAll('.annotation3')
+      //       .style('opacity', 0)
+      //       enableFilter = false;
+      //   },
+      //   index: 2
+      // }
     ]
 
 </script>
