@@ -131,12 +131,12 @@ const annotation1 = {
         ellipseRY: 67,
         textValue: "A few outliers in the E(6+) rating skew the sales numbers"
     };
-    const annotation0 = { ...annotation1, annotationNumber: 0, rectWidth: 390,
+    const annotation0 = { ...annotation1, annotationNumber: 0, rectWidth: 390, ellipse: false, circleR: 0,
       textValue: "Here we can see general sales trends based on critic scores"};
     const annotation2 = { ...annotation1, annotationNumber: 2, rectWidth: 360, lineEndX: 550, lineEndY: 220,
       ellipse: false, circleX: 660, circleY: 240, circleR: 130, //ellipseRX: 200, ellipseRY: 200,
       textValue: "Mature games seem to trend to higher ratings and sales"};
-    const annotation3 = { ...annotation1, annotationNumber: 3, rectWidth: 280,
+    const annotation3 = { ...annotation1, annotationNumber: 3, rectWidth: 280, ellipse: false, circleR: 0,
     textValue: "Feel free to explore the interactive dataset"};
 
     const annotations = [
@@ -318,9 +318,9 @@ const annotation1 = {
               return d;
             });
 
-        if (enableLegend) {
           var currentlyActiveRating;
           legend.on('click', function(ageRating){
+            if (enableLegend) {
 			          d3.selectAll('.dot')
 				          .style('opacity', function(d) {
                       if (ageRating == currentlyActiveRating) return 1.0;
@@ -335,9 +335,11 @@ const annotation1 = {
                   } else {
                     currentlyActiveRating = ageRating;
                   }
+                }
                 })
         
         legend.on("mouseover", function(ageRating) {
+          if (enableLegend) {
           if (!currentlyActiveRating) {
             d3.selectAll('.dot')
             .style('opacity', 0.0)
@@ -346,13 +348,15 @@ const annotation1 = {
                     })
             .style('opacity', 1);
           }
+        }
         }).on("mouseout", function(d) {
+          if (enableLegend) {
           if (!currentlyActiveRating) {
             d3.selectAll('.dot')
             .style('opacity', 1.0)
           }
+        }
         });
-      }
 
         function brushended() {
             var s = d3.event.selection;
@@ -390,7 +394,7 @@ const annotation1 = {
 
         function addAnnotation(dataStore) {
 
-    svg.append(`${dataStore.ellipse ? "ellipse" : "circle"}`)
+svg.append(`${dataStore.ellipse ? "ellipse" : "circle"}`)
     .attr("class", `circle${dataStore.annotationNumber}`)
     .attr("cx", dataStore.circleX)
     .attr("cy", dataStore.circleY)
